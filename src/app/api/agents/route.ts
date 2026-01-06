@@ -9,7 +9,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, displayName, description, prompts, voice, llm, advanced, ownerId } = body
+    const { name, displayName, description, prompts, voice, transcriber, llm, conversation, ownerId } = body
 
     if (!name || !displayName) {
       return NextResponse.json(
@@ -24,8 +24,9 @@ export async function POST(request: NextRequest) {
       description: description || '',
       prompts,
       voice,
+      transcriber,
       llm,
-      advanced,
+      conversation,
     }, ownerId)
 
     return NextResponse.json(agent, { status: 201 })

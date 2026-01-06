@@ -5,16 +5,19 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { 
   Phone, Bot, Users, Menu, X, Sparkles, 
-  BarChart3, History, PhoneCall, Settings
+  BarChart3, History, PhoneCall, Settings,
+  PhoneOutgoing, PhoneIncoming
 } from 'lucide-react'
 
 const links = [
-  { href: '/', label: 'Call', icon: PhoneCall },
-  { href: '/dashboard', label: 'Dashboard', icon: BarChart3 },
-  { href: '/agents', label: 'Agents', icon: Bot },
-  { href: '/calls', label: 'Calls', icon: History },
-  { href: '/users', label: 'Users', icon: Users },
-  { href: '/settings', label: 'Settings', icon: Settings },
+  { href: '/', label: 'Test Call', icon: PhoneCall, group: 'main' },
+  { href: '/dashboard', label: 'Dashboard', icon: BarChart3, group: 'main' },
+  { href: '/agents', label: 'Agents', icon: Bot, group: 'main' },
+  { href: '/phone-numbers', label: 'Phone Numbers', icon: Phone, group: 'telephony' },
+  { href: '/outbound', label: 'Outbound', icon: PhoneOutgoing, group: 'telephony' },
+  { href: '/calls', label: 'Call Logs', icon: History, group: 'main' },
+  { href: '/users', label: 'Users', icon: Users, group: 'admin' },
+  { href: '/settings', label: 'Settings', icon: Settings, group: 'admin' },
 ]
 
 export default function Navbar() {
@@ -40,7 +43,7 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">
-            {links.map((link) => {
+            {links.slice(0, 6).map((link) => {
               const Icon = link.icon
               const isActive = pathname === link.href
               return (
@@ -58,6 +61,34 @@ export default function Navbar() {
                 </Link>
               )
             })}
+            
+            {/* More dropdown for admin links */}
+            <div className="relative group">
+              <button className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all">
+                <Settings size={18} />
+                More
+              </button>
+              <div className="absolute right-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                {links.slice(6).map((link) => {
+                  const Icon = link.icon
+                  const isActive = pathname === link.href
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors first:rounded-t-xl last:rounded-b-xl ${
+                        isActive
+                          ? 'bg-sky-500/20 text-sky-400'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                      }`}
+                    >
+                      <Icon size={18} />
+                      {link.label}
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
