@@ -9,7 +9,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, displayName, description, welcomeMessage, instructions, voice } = body
+    const { name, displayName, description, prompts, voice, llm, advanced, ownerId } = body
 
     if (!name || !displayName) {
       return NextResponse.json(
@@ -22,10 +22,11 @@ export async function POST(request: NextRequest) {
       name,
       displayName,
       description: description || '',
-      welcomeMessage: welcomeMessage || 'Hello! How can I help you?',
-      instructions: instructions || '',
-      voice: voice || 'alloy',
-    })
+      prompts,
+      voice,
+      llm,
+      advanced,
+    }, ownerId)
 
     return NextResponse.json(agent, { status: 201 })
   } catch (error) {

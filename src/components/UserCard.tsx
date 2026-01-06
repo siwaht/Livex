@@ -1,6 +1,6 @@
 'use client'
 
-import { Settings, Trash2, Key, Bot, CheckCircle2, XCircle } from 'lucide-react'
+import { Settings, Trash2, Key, Bot, CheckCircle2, XCircle, CreditCard, Clock } from 'lucide-react'
 import { User } from '@/types/user'
 
 interface UserCardProps {
@@ -18,23 +18,51 @@ export default function UserCard({
   onManageLiveKit,
   onManageAgents,
 }: UserCardProps) {
+  const billingStatusConfig = {
+    active: { class: 'badge-success', label: 'Active' },
+    past_due: { class: 'badge-danger', label: 'Past Due' },
+    canceled: { class: 'badge-danger', label: 'Canceled' },
+    trialing: { class: 'badge-info', label: 'Trial' },
+  }
+
+  const billingStatus = billingStatusConfig[user.billingStatus]
+
   return (
     <div className="card card-hover p-5 sm:p-6 flex flex-col h-full animate-fade-in">
       {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-white truncate mb-1">
+          <h3 className="text-lg font-semibold text-white truncate mb-0.5">
             {user.name}
           </h3>
           <p className="text-sm text-slate-400 truncate">{user.email}</p>
         </div>
-        <span className={user.role === 'admin' ? 'badge-purple' : 'badge-info'}>
-          {user.role}
-        </span>
+        <div className="flex flex-col items-end gap-1">
+          <span className={user.role === 'admin' ? 'badge-purple' : 'badge-info'}>
+            {user.role}
+          </span>
+          <span className={billingStatus.class}>{billingStatus.label}</span>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="p-2 bg-slate-900/50 rounded-lg text-center">
+          <p className="text-lg font-bold">{user.usage.callsThisMonth}</p>
+          <p className="text-xs text-slate-500">Calls</p>
+        </div>
+        <div className="p-2 bg-slate-900/50 rounded-lg text-center">
+          <p className="text-lg font-bold">{user.usage.minutesThisMonth.toFixed(0)}</p>
+          <p className="text-xs text-slate-500">Minutes</p>
+        </div>
+        <div className="p-2 bg-slate-900/50 rounded-lg text-center">
+          <p className="text-lg font-bold">{user.agentIds.length}</p>
+          <p className="text-xs text-slate-500">Agents</p>
+        </div>
       </div>
 
       {/* Status indicators */}
-      <div className="space-y-2.5 mb-5 flex-1">
+      <div className="space-y-2 mb-4 flex-1">
         <div className="flex items-center gap-2.5 text-sm">
           {user.livekit ? (
             <>
@@ -49,10 +77,8 @@ export default function UserCard({
           )}
         </div>
         <div className="flex items-center gap-2.5 text-sm text-slate-400">
-          <Bot size={16} className="flex-shrink-0" />
-          <span>
-            {user.agentIds.length} agent{user.agentIds.length !== 1 ? 's' : ''} assigned
-          </span>
+          <CreditCard size={16} className="flex-shrink-0" />
+          <span className="capitalize">{user.plan} Plan</span>
         </div>
       </div>
 

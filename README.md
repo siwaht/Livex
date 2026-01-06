@@ -1,34 +1,47 @@
-# LiveKit Voice Agent Platform
+# VoiceAgent Platform
 
-A frontend platform for agencies to create, manage, and deploy LiveKit voice AI agents. Users can access voice calling agents through a clean web interface.
+A production-ready SaaS platform for agencies to create, manage, and monetize LiveKit voice AI agents. Provide your users with a white-label frontend to access voice calling agents.
 
 ## Features
 
-- **User Management**: Create users and assign individual LiveKit accounts
-- **Agent Management**: Create, edit, and delete voice agents with custom configurations
-- **Multi-tenant**: Each user can have their own LiveKit credentials
-- **Agent Assignment**: Assign specific agents to specific users
-- **Voice Calling**: Real-time voice conversations with AI agents using LiveKit
-- **User Portal**: Clean interface for end users to access available agents
-- **Admin Dashboard**: Manage agents, users, and LiveKit configurations
+### For Agencies
+- **Multi-tenant User Management**: Create users, assign LiveKit accounts, manage billing
+- **Agent Configuration**: Full control over prompts, voice, LLM, webhooks, MCP servers
+- **Analytics Dashboard**: Real-time metrics, call history, cost tracking
+- **Phone Number Management**: Assign phone numbers for inbound calls
+- **API Keys**: Provide users with API access to your platform
+- **Billing & Plans**: Track usage, set limits, manage subscriptions
+
+### Agent Configuration
+- **Prompts**: System prompt, first message, fallback, end call, transfer messages
+- **Voice**: OpenAI, ElevenLabs, Deepgram, PlayHT with speed/pitch controls
+- **LLM**: OpenAI, Anthropic, Groq, Together AI with temperature/token settings
+- **Advanced**: Interruption threshold, silence timeout, call recording, VAD
+- **Webhooks**: Real-time notifications for call events
+- **MCP Servers**: Connect external tools via Model Context Protocol
+- **Phone Numbers**: Twilio, Vonage, Telnyx integration
+
+### Analytics
+- Total calls, minutes, cost tracking
+- Success rate and latency metrics
+- Per-agent performance breakdown
+- Sentiment analysis
+- Daily/weekly/monthly trends
 
 ## Quick Start
 
-### 1. Install Dependencies
-
 ```bash
+# Install dependencies
 npm install
-```
 
-### 2. Configure Environment
-
-Copy `.env.example` to `.env.local` and add your LiveKit credentials:
-
-```bash
+# Configure environment
 cp .env.example .env.local
+
+# Run development server
+npm run dev
 ```
 
-Get your credentials from [LiveKit Cloud](https://cloud.livekit.io):
+## Environment Variables
 
 ```env
 LIVEKIT_API_KEY=your_api_key
@@ -36,76 +49,83 @@ LIVEKIT_API_SECRET=your_api_secret
 LIVEKIT_URL=wss://your-project.livekit.cloud
 ```
 
-### 3. Deploy Your Agent Backend
-
-You need a LiveKit agent running on the backend. Follow the [LiveKit Voice AI quickstart](https://docs.livekit.io/agents/quickstart/) to create and deploy your agent.
-
-### 4. Run Development Server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to view the application.
-
 ## Project Structure
 
 ```
 src/
 ├── app/
 │   ├── api/
-│   │   ├── agents/       # Agent CRUD endpoints
-│   │   ├── users/        # User management + LiveKit assignment
-│   │   └── token/        # LiveKit token generation
-│   ├── admin/
-│   │   ├── page.tsx      # Agent management
-│   │   └── users/        # User management
-│   └── page.tsx          # User-facing agent list
+│   │   ├── agents/         # Agent CRUD
+│   │   ├── analytics/      # Analytics endpoints
+│   │   ├── token/          # LiveKit token generation
+│   │   └── users/          # User management
+│   ├── agents/             # Agent management page
+│   ├── calls/              # Call history page
+│   ├── dashboard/          # Analytics dashboard
+│   ├── settings/           # Platform settings
+│   ├── users/              # User management page
+│   └── page.tsx            # Voice call interface
 ├── components/
-│   ├── AgentCard.tsx     # Agent display card
-│   ├── AgentForm.tsx     # Create/edit agent form
-│   ├── AgentAssignModal.tsx  # Assign agents to users
-│   ├── LiveKitModal.tsx  # Manage user LiveKit credentials
-│   ├── Navbar.tsx        # Navigation
-│   ├── UserCard.tsx      # User display card
-│   ├── UserForm.tsx      # Create/edit user form
-│   └── VoiceCall.tsx     # LiveKit voice call interface
+│   ├── AgentCard.tsx
+│   ├── AgentConfig.tsx     # Full agent configuration
+│   ├── AgentForm.tsx
+│   ├── AnalyticsDashboard.tsx
+│   ├── CallHistory.tsx
+│   ├── Navbar.tsx
+│   ├── UserCard.tsx
+│   ├── UserForm.tsx
+│   └── VoiceCall.tsx
 ├── lib/
-│   ├── agents-store.ts   # Agent data store
-│   ├── users-store.ts    # User data store
-│   └── livekit.ts        # LiveKit token utilities
+│   ├── agents-store.ts
+│   ├── analytics-store.ts
+│   ├── livekit.ts
+│   └── users-store.ts
 └── types/
-    ├── agent.ts          # Agent types
-    └── user.ts           # User types
+    ├── agent.ts
+    ├── analytics.ts
+    └── user.ts
 ```
 
 ## API Endpoints
 
+### Agents
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/agents` | List all agents |
-| POST | `/api/agents` | Create new agent |
-| GET | `/api/agents/[id]` | Get agent by ID |
+| POST | `/api/agents` | Create agent |
+| GET | `/api/agents/[id]` | Get agent |
 | PUT | `/api/agents/[id]` | Update agent |
 | DELETE | `/api/agents/[id]` | Delete agent |
+
+### Users
+| Method | Endpoint | Description |
+|--------|----------|-------------|
 | GET | `/api/users` | List all users |
-| POST | `/api/users` | Create new user |
-| GET | `/api/users/[id]` | Get user by ID |
+| POST | `/api/users` | Create user |
 | PUT | `/api/users/[id]` | Update user |
 | DELETE | `/api/users/[id]` | Delete user |
-| PUT | `/api/users/[id]/livekit` | Set user's LiveKit credentials |
-| DELETE | `/api/users/[id]/livekit` | Remove user's LiveKit credentials |
-| GET | `/api/users/[id]/agents` | Get user's assigned agents |
-| POST | `/api/users/[id]/agents` | Assign agent to user |
-| DELETE | `/api/users/[id]/agents` | Remove agent from user |
+| PUT | `/api/users/[id]/livekit` | Set LiveKit credentials |
+| POST | `/api/users/[id]/agents` | Assign agent |
+
+### Analytics
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/analytics` | Get analytics summary |
+| GET | `/api/analytics/calls` | Get call history |
+
+### Token
+| Method | Endpoint | Description |
+|--------|----------|-------------|
 | POST | `/api/token` | Generate LiveKit token |
 
 ## Production Deployment
 
-1. Replace the in-memory agent store with a database (PostgreSQL, MongoDB, etc.)
-2. Add authentication for the admin dashboard
-3. Set up proper environment variables in your hosting platform
-4. Deploy your LiveKit agent backend
+1. Replace in-memory stores with a database (PostgreSQL, MongoDB)
+2. Add authentication (NextAuth, Clerk, Auth0)
+3. Integrate payment provider (Stripe)
+4. Deploy LiveKit agent backend
+5. Configure telephony provider (Twilio, Vonage, Telnyx)
+6. Set up monitoring and alerting
 
 ## Tech Stack
 
@@ -113,3 +133,4 @@ src/
 - LiveKit React SDK
 - Tailwind CSS
 - TypeScript
+- Lucide Icons

@@ -2,129 +2,82 @@
 
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import { Agent, CreateAgentInput } from '@/types/agent'
+import { CreateAgentInput } from '@/types/agent'
 
 interface AgentFormProps {
-  agent?: Agent
   onSave: (data: CreateAgentInput) => void
   onCancel: () => void
 }
 
-const VOICE_OPTIONS = [
-  { value: 'alloy', label: 'Alloy (Neutral)' },
-  { value: 'echo', label: 'Echo (Male)' },
-  { value: 'fable', label: 'Fable (British)' },
-  { value: 'onyx', label: 'Onyx (Deep Male)' },
-  { value: 'nova', label: 'Nova (Female)' },
-  { value: 'shimmer', label: 'Shimmer (Soft Female)' },
-]
-
-export default function AgentForm({ agent, onSave, onCancel }: AgentFormProps) {
-  const [formData, setFormData] = useState<CreateAgentInput>({
-    name: agent?.name || '',
-    displayName: agent?.displayName || '',
-    description: agent?.description || '',
-    welcomeMessage: agent?.welcomeMessage || 'Hello! How can I help you today?',
-    instructions: agent?.instructions || '',
-    voice: agent?.voice || 'alloy',
+export default function AgentForm({ onSave, onCancel }: AgentFormProps) {
+  const [formData, setFormData] = useState({
+    name: '',
+    displayName: '',
+    description: '',
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSave(formData)
+    onSave({
+      name: formData.name || formData.displayName.toLowerCase().replace(/\s+/g, '-'),
+      displayName: formData.displayName,
+      description: formData.description,
+    })
   }
 
   return (
     <div className="modal-overlay" onClick={onCancel}>
       <div 
-        className="modal-content modal-content-lg animate-slide-up"
+        className="modal-content animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
-          <h2 className="modal-title">
-            {agent ? 'Edit Agent' : 'Create New Agent'}
-          </h2>
+          <h2 className="modal-title">Create New Agent</h2>
           <button onClick={onCancel} className="btn-icon" aria-label="Close">
             <X size={20} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-body space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="label">Agent ID</label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="input"
-                placeholder="support-agent"
-                required
-                disabled={!!agent}
-              />
-              <p className="text-xs text-slate-500 mt-1.5">
-                Unique identifier (no spaces)
-              </p>
-            </div>
-            <div>
-              <label className="label">Display Name</label>
-              <input
-                type="text"
-                value={formData.displayName}
-                onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-                className="input"
-                placeholder="Customer Support"
-                required
-              />
-            </div>
+          <div>
+            <label className="label">Display Name</label>
+            <input
+              type="text"
+              value={formData.displayName}
+              onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+              className="input"
+              placeholder="Customer Support"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="label">Agent ID (optional)</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="input"
+              placeholder="customer-support"
+            />
+            <p className="text-xs text-slate-500 mt-1">
+              Auto-generated from display name if left empty
+            </p>
           </div>
 
           <div>
             <label className="label">Description</label>
-            <input
-              type="text"
+            <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="input"
-              placeholder="Brief description of the agent's purpose"
+              className="textarea h-24"
+              placeholder="Brief description of what this agent does..."
             />
           </div>
 
-          <div>
-            <label className="label">Voice</label>
-            <select
-              value={formData.voice}
-              onChange={(e) => setFormData({ ...formData, voice: e.target.value })}
-              className="select"
-            >
-              {VOICE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="label">Welcome Message</label>
-            <input
-              type="text"
-              value={formData.welcomeMessage}
-              onChange={(e) => setFormData({ ...formData, welcomeMessage: e.target.value })}
-              className="input"
-              placeholder="Hello! How can I help you today?"
-            />
-          </div>
-
-          <div>
-            <label className="label">Instructions (System Prompt)</label>
-            <textarea
-              value={formData.instructions}
-              onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
-              className="textarea h-28"
-              placeholder="Define the agent's personality, behavior, and capabilities..."
-            />
-          </div>
+          <p className="text-sm text-slate-400 bg-slate-900/50 p-3 rounded-lg">
+            💡 After creating the agent, you can configure prompts, voice, LLM settings, webhooks, and more.
+          </p>
         </form>
 
         <div className="modal-footer">
@@ -132,7 +85,7 @@ export default function AgentForm({ agent, onSave, onCancel }: AgentFormProps) {
             Cancel
           </button>
           <button onClick={handleSubmit} className="btn-primary w-full sm:w-auto">
-            {agent ? 'Save Changes' : 'Create Agent'}
+            Create Agent
           </button>
         </div>
       </div>

@@ -3,12 +3,18 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Phone, Bot, Users, Menu, X, Sparkles } from 'lucide-react'
+import { 
+  Phone, Bot, Users, Menu, X, Sparkles, 
+  BarChart3, History, PhoneCall, Settings
+} from 'lucide-react'
 
 const links = [
-  { href: '/', label: 'Call Agents', icon: Phone },
-  { href: '/admin', label: 'Agents', icon: Bot },
-  { href: '/admin/users', label: 'Users', icon: Users },
+  { href: '/', label: 'Call', icon: PhoneCall },
+  { href: '/dashboard', label: 'Dashboard', icon: BarChart3 },
+  { href: '/agents', label: 'Agents', icon: Bot },
+  { href: '/calls', label: 'Calls', icon: History },
+  { href: '/users', label: 'Users', icon: Users },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ]
 
 export default function Navbar() {
@@ -24,13 +30,16 @@ export default function Navbar() {
             <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/25 group-hover:shadow-sky-500/40 transition-shadow">
               <Sparkles size={20} className="text-white" />
             </div>
-            <span className="font-bold text-xl hidden sm:block bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-              VoiceAgent
-            </span>
+            <div className="hidden sm:block">
+              <span className="font-bold text-lg bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+                VoiceAgent
+              </span>
+              <span className="text-xs text-slate-500 block -mt-0.5">Platform</span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-1">
             {links.map((link) => {
               const Icon = link.icon
               const isActive = pathname === link.href
@@ -38,7 +47,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                     isActive
                       ? 'bg-sky-500/20 text-sky-400 shadow-inner'
                       : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
@@ -54,7 +63,7 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden btn-icon"
+            className="lg:hidden btn-icon"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -63,8 +72,8 @@ export default function Navbar() {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-slate-800/50 animate-slide-down">
-            <div className="flex flex-col gap-1">
+          <div className="lg:hidden py-4 border-t border-slate-800/50 animate-slide-down">
+            <div className="grid grid-cols-2 gap-2">
               {links.map((link) => {
                 const Icon = link.icon
                 const isActive = pathname === link.href

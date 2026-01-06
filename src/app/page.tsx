@@ -5,7 +5,7 @@ import Navbar from '@/components/Navbar'
 import AgentCard from '@/components/AgentCard'
 import VoiceCall from '@/components/VoiceCall'
 import { Agent } from '@/types/agent'
-import { Phone, Search, Sparkles } from 'lucide-react'
+import { PhoneCall, Search, Sparkles } from 'lucide-react'
 
 export default function HomePage() {
   const [agents, setAgents] = useState<Agent[]>([])
@@ -51,24 +51,22 @@ export default function HomePage() {
       <Navbar />
 
       <main className="page-content">
-        {/* Header */}
-        <div className="page-header">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="page-title flex items-center gap-3">
-                <Sparkles className="text-sky-400" size={28} />
-                Voice Agents
-              </h1>
-              <p className="page-subtitle">
-                Select an agent to start a voice conversation
-              </p>
-            </div>
+        {/* Hero */}
+        <div className="text-center mb-10">
+          <div className="w-16 h-16 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-sky-500/25">
+            <Sparkles size={32} className="text-white" />
           </div>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-3">
+            Voice AI Agents
+          </h1>
+          <p className="text-slate-400 max-w-md mx-auto">
+            Start a conversation with any of our AI-powered voice agents
+          </p>
         </div>
 
         {/* Search */}
-        <div className="mb-6">
-          <div className="relative max-w-md">
+        <div className="mb-8 max-w-md mx-auto">
+          <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
             <input
               type="text"
@@ -88,9 +86,9 @@ export default function HomePage() {
         ) : filteredAgents.length === 0 ? (
           <div className="empty-state">
             <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Phone className="empty-state-icon" size={32} />
+              <PhoneCall className="text-slate-600" size={32} />
             </div>
-            <p className="empty-state-text">
+            <p className="text-slate-400">
               {searchQuery ? 'No agents match your search' : 'No agents available'}
             </p>
           </div>

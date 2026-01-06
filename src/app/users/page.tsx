@@ -7,7 +7,7 @@ import UserForm from '@/components/UserForm'
 import LiveKitModal from '@/components/LiveKitModal'
 import AgentAssignModal from '@/components/AgentAssignModal'
 import { User, CreateUserInput, LiveKitCredentials } from '@/types/user'
-import { Plus, AlertCircle, Users, X } from 'lucide-react'
+import { Plus, AlertCircle, Users, X, Search } from 'lucide-react'
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([])
@@ -17,6 +17,7 @@ export default function UsersPage() {
   const [liveKitUser, setLiveKitUser] = useState<User | null>(null)
   const [agentUser, setAgentUser] = useState<User | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     fetchUsers()
@@ -56,7 +57,7 @@ export default function UsersPage() {
   }
 
   async function handleDelete(user: User) {
-    if (!confirm(`Delete "${user.name}"?`)) return
+    if (!confirm(`Delete "${user.name}"? This cannot be undone.`)) return
 
     try {
       const response = await fetch(`/api/users/${user.id}`, { method: 'DELETE' })
@@ -147,17 +148,24 @@ export default function UsersPage() {
     }
   }
 
+  const filteredUsers = users.filter(user =>
+    user.name.toLowerCase().includes(search.toLowerCase()) ||
+    user.email.toLowerCase().includes(search.toLowerCase())
+  )
+
   return (
     <div className="page-container">
       <Navbar />
 
       <main className="page-content">
-        {/* Header */}
         <div className="page-header">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="page-title">User Management</h1>
-              <p className="page-subtitle">Create users and assign LiveKit accounts</p>
+              <h1 className="page-title flex items-center gap-3">
+                <Users className="text-sky-400" size={28} />
+                User Management
+              </h1>
+              <p className="page-subtitle">Manage users and their LiveKit accounts</p>
             </div>
             <button
               onClick={() => setShowForm(true)}
@@ -169,43 +177,52 @@ export default function UsersPage() {
           </div>
         </div>
 
-        {/* Error Alert */}
+        {/* Search */}
+        <div className="mb-6">
+          <div className="relative max-w-md">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="input pl-12"
+            />
+          </div>
+        </div>
+
         {error && (
           <div className="alert-error animate-slide-down">
             <AlertCircle className="text-red-400 flex-shrink-0" size={20} />
             <span className="text-red-400 flex-1">{error}</span>
-            <button
-              onClick={() => setError(null)}
-              className="btn-icon text-red-400 hover:text-red-300"
-              aria-label="Dismiss"
-            >
+            <button onClick={() => setError(null)} className="btn-icon text-red-400">
               <X size={18} />
             </button>
           </div>
         )}
 
-        {/* Content */}
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <div className="spinner w-10 h-10" />
           </div>
-        ) : users.length === 0 ? (
+        ) : filteredUsers.length === 0 ? (
           <div className="empty-state card p-8 sm:p-12">
             <div className="w-16 h-16 bg-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Users size={32} className="text-slate-500" />
             </div>
-            <p className="empty-state-text">No users created yet</p>
-            <button
-              onClick={() => setShowForm(true)}
-              className="btn-primary"
-            >
-              <Plus size={18} />
-              <span>Create Your First User</span>
-            </button>
+            <p className="empty-state-text">
+              {search ? 'No users match your search' : 'No users created yet'}
+            </p>
+            {!search && (
+              <button onClick={() => setShowForm(true)} className="btn-primary">
+                <Plus size={18} />
+                <span>Create Your First User</span>
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid-cards">
-            {users.map((user) => (
+            {filteredUsers.map((user) => (
               <UserCard
                 key={user.id}
                 user={user}
@@ -218,7 +235,6 @@ export default function UsersPage() {
           </div>
         )}
 
-        {/* Modals */}
         {showForm && (
           <UserForm
             user={editingUser}

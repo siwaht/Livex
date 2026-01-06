@@ -1,6 +1,6 @@
 'use client'
 
-import { Phone, Settings, Trash2, Volume2 } from 'lucide-react'
+import { Phone, Settings, Trash2, Volume2, MessageSquare } from 'lucide-react'
 import { Agent } from '@/types/agent'
 
 interface AgentCardProps {
@@ -42,7 +42,7 @@ export default function AgentCard({
               <button
                 onClick={() => onEdit(agent)}
                 className="btn-icon"
-                aria-label="Edit agent"
+                aria-label="Configure agent"
               >
                 <Settings size={18} />
               </button>
@@ -65,10 +65,16 @@ export default function AgentCard({
         {agent.description || 'No description provided'}
       </p>
 
-      {/* Voice info */}
-      <div className="flex items-center gap-2 text-sm text-slate-500 mb-5">
-        <Volume2 size={14} />
-        <span className="capitalize">{agent.voice}</span>
+      {/* Config summary */}
+      <div className="flex flex-wrap gap-2 mb-4 text-xs">
+        <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-900/50 rounded-lg text-slate-400">
+          <Volume2 size={12} />
+          <span className="capitalize">{agent.voice.voiceId}</span>
+        </div>
+        <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-900/50 rounded-lg text-slate-400">
+          <MessageSquare size={12} />
+          <span>{agent.llm.model}</span>
+        </div>
       </div>
 
       {/* Action button */}
