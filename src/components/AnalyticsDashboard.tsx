@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { 
   Phone, Clock, DollarSign, TrendingUp, TrendingDown, 
-  Activity, CheckCircle, XCircle, BarChart3
+  Activity, CheckCircle, XCircle, AlertCircle
 } from 'lucide-react'
 import { AnalyticsSummary, DailyStats, AgentAnalytics } from '@/types/analytics'
 
@@ -12,27 +12,32 @@ interface StatCardProps {
   value: string | number
   change?: number
   icon: typeof Phone
-  color: string
+  iconBg: string
+  iconColor: string
 }
 
-function StatCard({ title, value, change, icon: Icon, color }: StatCardProps) {
+function StatCard({ title, value, change, icon: Icon, iconBg, iconColor }: StatCardProps) {
   return (
-    <div className="card p-5">
-      <div className="flex items-start justify-between mb-3">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color}`}>
-          <Icon size={20} />
+    <div className="card p-4">
+      <div className="flex items-center gap-3">
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${iconBg}`}>
+          <Icon size={20} className={iconColor} />
         </div>
-        {change !== undefined && (
-          <div className={`flex items-center gap-1 text-xs font-medium ${
-            change >= 0 ? 'text-emerald-400' : 'text-red-400'
-          }`}>
-            {change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-            {Math.abs(change).toFixed(1)}%
+        <div className="flex-1">
+          <p className="text-2xl font-bold">{value}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-xs text-slate-400">{title}</p>
+            {change !== undefined && (
+              <span className={`flex items-center gap-0.5 text-xs font-medium ${
+                change >= 0 ? 'text-emerald-400' : 'text-red-400'
+              }`}>
+                {change >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                {Math.abs(change).toFixed(0)}%
+              </span>
+            )}
           </div>
-        )}
+        </div>
       </div>
-      <p className="text-2xl font-bold mb-1">{value}</p>
-      <p className="text-sm text-slate-400">{title}</p>
     </div>
   )
 }
@@ -40,12 +45,12 @@ function StatCard({ title, value, change, icon: Icon, color }: StatCardProps) {
 function MiniChart({ data, color }: { data: number[]; color: string }) {
   const max = Math.max(...data, 1)
   return (
-    <div className="flex items-end gap-0.5 h-12">
+    <div className="flex items-end gap-1 h-16">
       {data.slice(-14).map((value, i) => (
         <div
           key={i}
-          className={`flex-1 rounded-sm ${color}`}
-          style={{ height: `${(value / max) * 100}%`, minHeight: '2px' }}
+          className={`flex-1 rounded-sm ${color} transition-all hover:opacity-80`}
+          style={{ height: `${Math.max((value / max) * 100, 4)}%` }}
         />
       ))}
     </div>
@@ -64,6 +69,7 @@ export default function AnalyticsDashboard() {
   }, [period])
 
   async function fetchAnalytics() {
+    setLoading(true)
     try {
       const response = await fetch(`/api/analytics?period=${period}`)
       const data = await response.json()
@@ -80,164 +86,163 @@ export default function AnalyticsDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <div className="spinner w-10 h-10" />
+        <div className="spinner w-8 h-8" />
       </div>
     )
   }
 
-  if (!summary) return null
+  if (!summary) {
+    return (
+      <div className="text-center py-16">
+        <AlertCircle size={32} className="text-slate-500 mx-auto mb-3" />
+        <p className="text-slate-400">Failed to load analytics</p>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
-      {/* Period selector */}
-      <div className="flex items-center gap-2">
+      {/* Period Tabs */}
+      <div className="flex gap-1 p-1 bg-slate-800/50 rounded-lg w-fit">
         {(['day', 'week', 'month'] as const).map((p) => (
           <button
             key={p}
             onClick={() => setPeriod(p)}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
               period === p
-                ? 'bg-sky-500/20 text-sky-400'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                ? 'bg-slate-700 text-white'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
-            {p.charAt(0).toUpperCase() + p.slice(1)}
+            {p === 'day' ? 'Today' : p === 'week' ? 'Week' : 'Month'}
           </button>
         ))}
       </div>
 
-      {/* Stats grid */}
+      {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Total Calls"
           value={summary.totalCalls.toLocaleString()}
           change={summary.callsChange}
           icon={Phone}
-          color="bg-sky-500/20 text-sky-400"
+          iconBg="bg-sky-500/20"
+          iconColor="text-sky-400"
         />
         <StatCard
-          title="Total Minutes"
+          title="Minutes"
           value={summary.totalMinutes.toFixed(0)}
           change={summary.minutesChange}
           icon={Clock}
-          color="bg-purple-500/20 text-purple-400"
+          iconBg="bg-purple-500/20"
+          iconColor="text-purple-400"
         />
         <StatCard
-          title="Total Cost"
+          title="Cost"
           value={`$${summary.totalCost.toFixed(2)}`}
           change={summary.costChange}
           icon={DollarSign}
-          color="bg-emerald-500/20 text-emerald-400"
+          iconBg="bg-emerald-500/20"
+          iconColor="text-emerald-400"
         />
         <StatCard
           title="Success Rate"
-          value={`${summary.successRate.toFixed(1)}%`}
+          value={`${summary.successRate.toFixed(0)}%`}
           icon={Activity}
-          color="bg-amber-500/20 text-amber-400"
+          iconBg="bg-amber-500/20"
+          iconColor="text-amber-400"
         />
       </div>
 
-      {/* Charts row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Calls chart */}
-        <div className="card p-5">
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="card p-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold">Calls Over Time</h3>
-            <BarChart3 size={18} className="text-slate-400" />
+            <h3 className="font-medium text-sm">Calls</h3>
+            <span className="text-xs text-slate-500">Last 14 days</span>
           </div>
           <MiniChart data={dailyStats.map(d => d.calls)} color="bg-sky-500" />
-          <div className="flex justify-between mt-2 text-xs text-slate-500">
-            <span>{dailyStats[0]?.date}</span>
-            <span>{dailyStats[dailyStats.length - 1]?.date}</span>
-          </div>
         </div>
-
-        {/* Cost chart */}
-        <div className="card p-5">
+        <div className="card p-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold">Cost Over Time</h3>
-            <DollarSign size={18} className="text-slate-400" />
+            <h3 className="font-medium text-sm">Cost</h3>
+            <span className="text-xs text-slate-500">Last 14 days</span>
           </div>
           <MiniChart data={dailyStats.map(d => d.cost)} color="bg-emerald-500" />
-          <div className="flex justify-between mt-2 text-xs text-slate-500">
-            <span>{dailyStats[0]?.date}</span>
-            <span>{dailyStats[dailyStats.length - 1]?.date}</span>
-          </div>
         </div>
       </div>
 
-      {/* Agent performance */}
-      <div className="card p-5">
-        <h3 className="font-semibold mb-4">Agent Performance</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="text-left text-sm text-slate-400 border-b border-slate-700/50">
-                <th className="pb-3 font-medium">Agent</th>
-                <th className="pb-3 font-medium text-right">Calls</th>
-                <th className="pb-3 font-medium text-right">Minutes</th>
-                <th className="pb-3 font-medium text-right">Avg Duration</th>
-                <th className="pb-3 font-medium text-right">Success</th>
-                <th className="pb-3 font-medium text-right">Sentiment</th>
-              </tr>
-            </thead>
-            <tbody>
-              {agentStats.map((agent) => (
-                <tr key={agent.agentId} className="border-b border-slate-700/30 last:border-0">
-                  <td className="py-3 font-medium">{agent.agentName}</td>
-                  <td className="py-3 text-right text-slate-300">{agent.totalCalls}</td>
-                  <td className="py-3 text-right text-slate-300">{agent.totalMinutes.toFixed(0)}</td>
-                  <td className="py-3 text-right text-slate-300">{agent.avgDuration.toFixed(0)}s</td>
-                  <td className="py-3 text-right">
-                    <span className={agent.successRate >= 80 ? 'text-emerald-400' : agent.successRate >= 60 ? 'text-amber-400' : 'text-red-400'}>
-                      {agent.successRate.toFixed(1)}%
-                    </span>
-                  </td>
-                  <td className="py-3 text-right">
-                    <div className="flex items-center justify-end gap-2 text-xs">
-                      <span className="text-emerald-400">{agent.sentiment.positive}</span>
-                      <span className="text-slate-400">{agent.sentiment.neutral}</span>
-                      <span className="text-red-400">{agent.sentiment.negative}</span>
-                    </div>
-                  </td>
+      {/* Quick Stats Row */}
+      <div className="grid grid-cols-4 gap-4">
+        <div className="card p-3 text-center">
+          <div className="flex items-center justify-center gap-1.5 text-emerald-400 mb-0.5">
+            <CheckCircle size={14} />
+            <span className="font-bold">{summary.completedCalls}</span>
+          </div>
+          <p className="text-xs text-slate-500">Completed</p>
+        </div>
+        <div className="card p-3 text-center">
+          <div className="flex items-center justify-center gap-1.5 text-red-400 mb-0.5">
+            <XCircle size={14} />
+            <span className="font-bold">{summary.failedCalls}</span>
+          </div>
+          <p className="text-xs text-slate-500">Failed</p>
+        </div>
+        <div className="card p-3 text-center">
+          <div className="flex items-center justify-center gap-1.5 text-purple-400 mb-0.5">
+            <Clock size={14} />
+            <span className="font-bold">{summary.avgDuration.toFixed(0)}s</span>
+          </div>
+          <p className="text-xs text-slate-500">Avg Duration</p>
+        </div>
+        <div className="card p-3 text-center">
+          <div className="flex items-center justify-center gap-1.5 text-amber-400 mb-0.5">
+            <Activity size={14} />
+            <span className="font-bold">{summary.avgLatency.toFixed(0)}ms</span>
+          </div>
+          <p className="text-xs text-slate-500">Latency</p>
+        </div>
+      </div>
+
+      {/* Agent Performance Table */}
+      {agentStats.length > 0 && (
+        <div className="card overflow-hidden">
+          <div className="p-4 border-b border-slate-700/50">
+            <h3 className="font-medium">Agent Performance</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-slate-400 border-b border-slate-700/30">
+                  <th className="px-4 py-3 font-medium">Agent</th>
+                  <th className="px-4 py-3 font-medium text-right">Calls</th>
+                  <th className="px-4 py-3 font-medium text-right">Minutes</th>
+                  <th className="px-4 py-3 font-medium text-right">Avg</th>
+                  <th className="px-4 py-3 font-medium text-right">Success</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Quick stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="card p-4 text-center">
-          <div className="flex items-center justify-center gap-2 text-emerald-400 mb-1">
-            <CheckCircle size={16} />
-            <span className="text-lg font-bold">{summary.completedCalls}</span>
+              </thead>
+              <tbody>
+                {agentStats.slice(0, 5).map((agent) => (
+                  <tr key={agent.agentId} className="border-b border-slate-700/20 last:border-0 hover:bg-slate-800/30">
+                    <td className="px-4 py-3 font-medium">{agent.agentName}</td>
+                    <td className="px-4 py-3 text-right text-slate-300">{agent.totalCalls}</td>
+                    <td className="px-4 py-3 text-right text-slate-300">{agent.totalMinutes.toFixed(0)}</td>
+                    <td className="px-4 py-3 text-right text-slate-300">{agent.avgDuration.toFixed(0)}s</td>
+                    <td className="px-4 py-3 text-right">
+                      <span className={`font-medium ${
+                        agent.successRate >= 80 ? 'text-emerald-400' : 
+                        agent.successRate >= 60 ? 'text-amber-400' : 'text-red-400'
+                      }`}>
+                        {agent.successRate.toFixed(0)}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <p className="text-xs text-slate-400">Completed</p>
         </div>
-        <div className="card p-4 text-center">
-          <div className="flex items-center justify-center gap-2 text-red-400 mb-1">
-            <XCircle size={16} />
-            <span className="text-lg font-bold">{summary.failedCalls}</span>
-          </div>
-          <p className="text-xs text-slate-400">Failed</p>
-        </div>
-        <div className="card p-4 text-center">
-          <div className="flex items-center justify-center gap-2 text-purple-400 mb-1">
-            <Clock size={16} />
-            <span className="text-lg font-bold">{summary.avgDuration.toFixed(0)}s</span>
-          </div>
-          <p className="text-xs text-slate-400">Avg Duration</p>
-        </div>
-        <div className="card p-4 text-center">
-          <div className="flex items-center justify-center gap-2 text-amber-400 mb-1">
-            <Activity size={16} />
-            <span className="text-lg font-bold">{summary.avgLatency.toFixed(0)}ms</span>
-          </div>
-          <p className="text-xs text-slate-400">Avg Latency</p>
-        </div>
-      </div>
+      )}
     </div>
   )
 }

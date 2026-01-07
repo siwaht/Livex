@@ -6,7 +6,9 @@ import AgentCard from '@/components/AgentCard'
 import AgentForm from '@/components/AgentForm'
 import AgentConfig from '@/components/AgentConfig'
 import { Agent, CreateAgentInput } from '@/types/agent'
-import { Plus, AlertCircle, Bot, X, Search } from 'lucide-react'
+import { Plus, AlertCircle, Bot, X, Search, Filter } from 'lucide-react'
+
+type StatusFilter = 'all' | 'active' | 'inactive' | 'draft'
 
 export default function AgentsPage() {
   const [agents, setAgents] = useState<Agent[]>([])
@@ -15,6 +17,7 @@ export default function AgentsPage() {
   const [configAgent, setConfigAgent] = useState<Agent | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
 
   useEffect(() => {
     fetchAgents()
@@ -39,9 +42,7 @@ export default function AgentsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
-
       if (!response.ok) throw new Error('Failed to create agent')
-
       await fetchAgents()
       setShowForm(false)
     } catch (err) {
@@ -51,16 +52,13 @@ export default function AgentsPage() {
 
   async function handleSaveConfig(updates: Partial<Agent>) {
     if (!configAgent) return
-
     try {
       const response = await fetch(`/api/agents/${configAgent.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
       })
-
       if (!response.ok) throw new Error('Failed to update agent')
-
       await fetchAgents()
       setConfigAgent(null)
     } catch (err) {
@@ -69,8 +67,7 @@ export default function AgentsPage() {
   }
 
   async function handleDelete(agent: Agent) {
-    if (!confirm(`Delete "${agent.displayName}"? This cannot be undone.`)) return
-
+    if (!confirm(`Delete "${agent.displayName}"?`)) return
     try {
       const response = await fetch(`/api/agents/${agent.id}`, { method: 'DELETE' })
       if (!response.ok) throw new Error('Failed to delete agent')
@@ -95,75 +92,100 @@ export default function AgentsPage() {
     }
   }
 
-  const filteredAgents = agents.filter(agent =>
-    agent.displayName.toLowerCase().includes(search.toLowerCase()) ||
-    agent.description.toLowerCase().includes(search.toLowerCase())
-  )
+  const filteredAgents = agents.filter(agent => {
+    const matchesSearch = agent.displayName.toLowerCase().includes(search.toLowerCase()) ||
+      agent.description.toLowerCase().includes(search.toLowerCase())
+    const matchesStatus = statusFilter === 'all' || agent.status === statusFilter
+    return matchesSearch && matchesStatus
+  })
+
+  const statusCounts = {
+    all: agents.length,
+    active: agents.filter(a => a.status === 'active').length,
+    inactive: agents.filter(a => a.status === 'inactive').length,
+    draft: agents.filter(a => a.status === 'draft').length,
+  }
 
   return (
     <div className="page-container">
       <Navbar />
 
       <main className="page-content">
-        <div className="page-header">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="page-title flex items-center gap-3">
-                <Bot className="text-sky-400" size={28} />
-                Voice Agents
-              </h1>
-              <p className="page-subtitle">Create and configure your AI voice agents</p>
-            </div>
-            <button
-              onClick={() => setShowForm(true)}
-              className="btn-primary w-full sm:w-auto"
-            >
-              <Plus size={18} />
-              <span>New Agent</span>
-            </button>
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl font-bold mb-1">Agents</h1>
+            <p className="text-sm text-slate-400">{agents.length} total agents</p>
           </div>
+          <button onClick={() => setShowForm(true)} className="btn-primary">
+            <Plus size={18} />
+            New Agent
+          </button>
         </div>
 
-        {/* Search */}
-        <div className="mb-6">
-          <div className="relative max-w-md">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+        {/* Filters */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
             <input
               type="text"
               placeholder="Search agents..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="input pl-12"
+              className="input pl-10 py-2"
             />
+          </div>
+          <div className="flex gap-1 p-1 bg-slate-800/50 rounded-lg">
+            {(['all', 'active', 'inactive', 'draft'] as StatusFilter[]).map((status) => (
+              <button
+                key={status}
+                onClick={() => setStatusFilter(status)}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                  statusFilter === status
+                    ? 'bg-slate-700 text-white'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {status.charAt(0).toUpperCase() + status.slice(1)}
+                <span className="ml-1.5 text-xs text-slate-500">({statusCounts[status]})</span>
+              </button>
+            ))}
           </div>
         </div>
 
+        {/* Error */}
         {error && (
-          <div className="alert-error animate-slide-down">
-            <AlertCircle className="text-red-400 flex-shrink-0" size={20} />
-            <span className="text-red-400 flex-1">{error}</span>
-            <button onClick={() => setError(null)} className="btn-icon text-red-400">
-              <X size={18} />
+          <div className="alert-error mb-6 animate-slide-down">
+            <AlertCircle className="text-red-400 flex-shrink-0" size={18} />
+            <span className="text-red-400 flex-1 text-sm">{error}</span>
+            <button onClick={() => setError(null)} className="text-red-400 hover:text-red-300">
+              <X size={16} />
             </button>
           </div>
         )}
 
+        {/* Content */}
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <div className="spinner w-10 h-10" />
+            <div className="spinner w-8 h-8" />
           </div>
         ) : filteredAgents.length === 0 ? (
-          <div className="empty-state card p-8 sm:p-12">
-            <div className="w-16 h-16 bg-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Bot size={32} className="text-slate-500" />
+          <div className="text-center py-16">
+            <div className="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Bot size={28} className="text-slate-600" />
             </div>
-            <p className="empty-state-text">
-              {search ? 'No agents match your search' : 'No agents created yet'}
+            <h3 className="font-semibold mb-1">
+              {search || statusFilter !== 'all' ? 'No matching agents' : 'No agents yet'}
+            </h3>
+            <p className="text-sm text-slate-400 mb-4">
+              {search || statusFilter !== 'all' 
+                ? 'Try adjusting your filters' 
+                : 'Create your first voice agent to get started'}
             </p>
-            {!search && (
+            {!search && statusFilter === 'all' && (
               <button onClick={() => setShowForm(true)} className="btn-primary">
                 <Plus size={18} />
-                <span>Create Your First Agent</span>
+                Create Agent
               </button>
             )}
           </div>
@@ -174,21 +196,19 @@ export default function AgentsPage() {
                 key={agent.id}
                 agent={agent}
                 onCall={() => {}}
-                onEdit={() => setConfigAgent(agent)}
+                onEdit={setConfigAgent}
                 onDelete={handleDelete}
+                onToggleStatus={handleToggleStatus}
                 showAdminControls
               />
             ))}
           </div>
         )}
 
+        {/* Modals */}
         {showForm && (
-          <AgentForm
-            onSave={handleCreate}
-            onCancel={() => setShowForm(false)}
-          />
+          <AgentForm onSave={handleCreate} onCancel={() => setShowForm(false)} />
         )}
-
         {configAgent && (
           <AgentConfig
             agent={configAgent}
