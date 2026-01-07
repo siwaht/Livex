@@ -1,18 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getUser, assignAgentToUser, removeAgentFromUser } from '@/lib/users-store'
 import { getAgent, getAgentsByOwner } from '@/lib/agents-store'
+import { successResponse, errorResponse, badRequestResponse, notFoundResponse, parseJsonBody } from '@/lib/api-utils'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const user = getUser(params.id)
-  if (!user) {
-    return NextResponse.json({ error: 'User not found' }, { status: 404 })
+  try {
+    const user = getUser(params.id)
+    if (!user) {
+      return notFoundResponse('User')
+    }
+    
+    const agents = getAgentsByOwner(params.id)
+    return successResponse(agents)
+  } catch (error) {
+    return errorResponse('Failed to fetch user agents', 500, error)
   }
-  
-  const agents = getAgentsByOwner(params.id)
-  return NextResponse.json(agents)
 }
 
 export async function POST(
@@ -20,29 +25,25 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { agentId } = await request.json()
+    const body = await parseJsonBody<{ agentId: string }>(request)
 
-    if (!agentId) {
-      return NextResponse.json({ error: 'agentId is required' }, { status: 400 })
+    if (!body || !body.agentId) {
+      return badRequestResponse('agentId is required')
     }
 
-    const agent = getAgent(agentId)
+    const agent = getAgent(body.agentId)
     if (!agent) {
-      return NextResponse.json({ error: 'Agent not found' }, { status: 404 })
+      return notFoundResponse('Agent')
     }
 
-    const updated = assignAgentToUser(params.id, agentId)
+    const updated = assignAgentToUser(params.id, body.agentId)
     if (!updated) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+      return notFoundResponse('User')
     }
 
-    return NextResponse.json(updated)
+    return successResponse(updated)
   } catch (error) {
-    console.error('Assign agent error:', error)
-    return NextResponse.json(
-      { error: 'Failed to assign agent' },
-      { status: 500 }
-    )
+    return errorResponse('Failed to assign agent', 500, error)
   }
 }
 
@@ -51,23 +52,19 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { agentId } = await request.json()
+    const body = await parseJsonBody<{ agentId: string }>(request)
 
-    if (!agentId) {
-      return NextResponse.json({ error: 'agentId is required' }, { status: 400 })
+    if (!body || !body.agentId) {
+      return badRequestResponse('agentId is required')
     }
 
-    const updated = removeAgentFromUser(params.id, agentId)
+    const updated = removeAgentFromUser(params.id, body.agentId)
     if (!updated) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+      return notFoundResponse('User')
     }
 
-    return NextResponse.json(updated)
+    return successResponse(updated)
   } catch (error) {
-    console.error('Remove agent error:', error)
-    return NextResponse.json(
-      { error: 'Failed to remove agent' },
-      { status: 500 }
-    )
+    return errorResponse('Failed to remove agent', 500, error)
   }
 }

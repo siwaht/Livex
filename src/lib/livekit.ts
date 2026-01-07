@@ -1,5 +1,6 @@
 import { AccessToken } from 'livekit-server-sdk'
 import { LiveKitCredentials } from '@/types/user'
+import { env } from '@/lib/env'
 
 export async function generateToken(
   roomName: string,
@@ -7,8 +8,8 @@ export async function generateToken(
   participantName: string,
   credentials?: LiveKitCredentials | null
 ): Promise<string> {
-  const apiKey = credentials?.apiKey || process.env.LIVEKIT_API_KEY
-  const apiSecret = credentials?.apiSecret || process.env.LIVEKIT_API_SECRET
+  const apiKey = credentials?.apiKey || env.LIVEKIT_API_KEY
+  const apiSecret = credentials?.apiSecret || env.LIVEKIT_API_SECRET
 
   if (!apiKey || !apiSecret) {
     throw new Error('LiveKit API credentials not configured')
@@ -32,5 +33,5 @@ export async function generateToken(
 }
 
 export function getLiveKitUrl(credentials?: LiveKitCredentials | null): string {
-  return credentials?.wsUrl || process.env.LIVEKIT_URL || 'wss://your-project.livekit.cloud'
+  return credentials?.wsUrl || env.LIVEKIT_URL || 'wss://your-project.livekit.cloud'
 }

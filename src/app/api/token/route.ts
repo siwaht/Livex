@@ -1,23 +1,36 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { generateToken, getLiveKitUrl } from '@/lib/livekit'
 import { getAgent } from '@/lib/agents-store'
 import { getUser } from '@/lib/users-store'
+import { successResponse, errorResponse, badRequestResponse, notFoundResponse, parseJsonBody } from '@/lib/api-utils'
+
+interface TokenRequest {
+  agentId: string
+  userName?: string
+  userId?: string
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { agentId, userName, userId } = await request.json()
+    const body = await parseJsonBody<TokenRequest>(request)
+    
+    if (!body) {
+      return badRequestResponse('Invalid JSON body')
+    }
+
+    const { agentId, userName, userId } = body
 
     if (!agentId) {
-      return NextResponse.json({ error: 'Agent ID required' }, { status: 400 })
+      return badRequestResponse('Agent ID is required')
     }
 
     const agent = getAgent(agentId)
     if (!agent) {
-      return NextResponse.json({ error: 'Agent not found' }, { status: 404 })
+      return notFoundResponse('Agent')
     }
 
     if (agent.status !== 'active') {
-      return NextResponse.json({ error: 'Agent is not active' }, { status: 400 })
+      return badRequestResponse('Agent is not active')
     }
 
     // Get user's LiveKit credentials if userId provided
@@ -28,7 +41,6 @@ export async function POST(request: NextRequest) {
         credentials = user.livekit
       }
     } else if (agent.ownerId) {
-      // Use agent owner's credentials
       const owner = getUser(agent.ownerId)
       if (owner?.livekit) {
         credentials = owner.livekit
@@ -41,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     const token = await generateToken(roomName, participantIdentity, participantName, credentials)
 
-    return NextResponse.json({
+    return successResponse({
       token,
       wsUrl: getLiveKitUrl(credentials),
       roomName,
@@ -49,10 +61,6 @@ export async function POST(request: NextRequest) {
       agentName: agent.name,
     })
   } catch (error) {
-    console.error('Token generation error:', error)
-    return NextResponse.json(
-      { error: 'Failed to generate token' },
-      { status: 500 }
-    )
+    return errorResponse('Failed to generate token', 500, error)
   }
 }

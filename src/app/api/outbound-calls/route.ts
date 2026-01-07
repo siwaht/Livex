@@ -1,30 +1,44 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getAllOutboundCalls, createOutboundCall, getOutboundCallStats } from '@/lib/telephony-store'
+import { successResponse, errorResponse, badRequestResponse, parseJsonBody } from '@/lib/api-utils'
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const includeStats = searchParams.get('stats') === 'true'
-  
-  const calls = getAllOutboundCalls()
-  
-  if (includeStats) {
-    const stats = getOutboundCallStats()
-    return NextResponse.json({ calls, stats })
+  try {
+    const { searchParams } = new URL(request.url)
+    const includeStats = searchParams.get('stats') === 'true'
+    
+    const calls = getAllOutboundCalls()
+    
+    if (includeStats) {
+      const stats = getOutboundCallStats()
+      return successResponse({ calls, stats })
+    }
+    
+    return successResponse(calls)
+  } catch (error) {
+    return errorResponse('Failed to fetch outbound calls', 500, error)
   }
-  
-  return NextResponse.json(calls)
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const body = await parseJsonBody<{
+      agentId: string
+      toNumber: string
+      fromNumberId: string
+      customCallerId?: string
+      dtmfSequence?: string
+      playDialtone?: boolean
+    }>(request)
+
+    if (!body) {
+      return badRequestResponse('Invalid JSON body')
+    }
+
     const { agentId, toNumber, fromNumberId, customCallerId, dtmfSequence, playDialtone } = body
 
     if (!agentId || !toNumber || !fromNumberId) {
-      return NextResponse.json(
-        { error: 'agentId, toNumber, and fromNumberId are required' },
-        { status: 400 }
-      )
+      return badRequestResponse('agentId, toNumber, and fromNumberId are required')
     }
 
     const call = createOutboundCall({
@@ -39,9 +53,8 @@ export async function POST(request: NextRequest) {
     // In production, this would trigger the actual LiveKit SIP call
     // await livekitSipService.createOutboundCall(call)
 
-    return NextResponse.json(call, { status: 201 })
+    return successResponse(call, 201)
   } catch (error) {
-    console.error('Create outbound call error:', error)
-    return NextResponse.json({ error: 'Failed to create outbound call' }, { status: 500 })
+    return errorResponse('Failed to create outbound call', 500, error)
   }
 }

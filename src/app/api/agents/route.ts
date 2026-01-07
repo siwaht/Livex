@@ -1,21 +1,38 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getAllAgents, createAgent } from '@/lib/agents-store'
+import { successResponse, errorResponse, badRequestResponse, parseJsonBody } from '@/lib/api-utils'
 
 export async function GET() {
-  const agents = getAllAgents()
-  return NextResponse.json(agents)
+  try {
+    const agents = getAllAgents()
+    return successResponse(agents)
+  } catch (error) {
+    return errorResponse('Failed to fetch agents', 500, error)
+  }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const body = await parseJsonBody<{
+      name: string
+      displayName: string
+      description?: string
+      prompts?: object
+      voice?: object
+      transcriber?: object
+      llm?: object
+      conversation?: object
+      ownerId?: string
+    }>(request)
+
+    if (!body) {
+      return badRequestResponse('Invalid JSON body')
+    }
+
     const { name, displayName, description, prompts, voice, transcriber, llm, conversation, ownerId } = body
 
     if (!name || !displayName) {
-      return NextResponse.json(
-        { error: 'Name and display name are required' },
-        { status: 400 }
-      )
+      return badRequestResponse('Name and display name are required')
     }
 
     const agent = createAgent({
@@ -29,12 +46,8 @@ export async function POST(request: NextRequest) {
       conversation,
     }, ownerId)
 
-    return NextResponse.json(agent, { status: 201 })
+    return successResponse(agent, 201)
   } catch (error) {
-    console.error('Create agent error:', error)
-    return NextResponse.json(
-      { error: 'Failed to create agent' },
-      { status: 500 }
-    )
+    return errorResponse('Failed to create agent', 500, error)
   }
 }
