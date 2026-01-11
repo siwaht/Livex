@@ -1,7 +1,40 @@
-// Voice Provider Types
-export type VoiceProvider = 'openai' | 'elevenlabs' | 'deepgram' | 'playht' | 'azure' | 'cartesia'
-export type LLMProvider = 'openai' | 'anthropic' | 'groq' | 'together' | 'azure' | 'custom'
-export type TranscriberProvider = 'deepgram' | 'openai' | 'assemblyai' | 'gladia'
+// Voice Provider Types (TTS)
+export type VoiceProvider = 
+  | 'openai' 
+  | 'elevenlabs' 
+  | 'deepgram' 
+  | 'playht' 
+  | 'azure' 
+  | 'cartesia'
+  | 'rime'
+  | 'lmnt'
+  | 'neets'
+
+// LLM Provider Types
+export type LLMProvider = 
+  | 'openai' 
+  | 'anthropic' 
+  | 'groq' 
+  | 'together' 
+  | 'azure' 
+  | 'google'
+  | 'cerebras'
+  | 'fireworks'
+  | 'perplexity'
+  | 'mistral'
+  | 'cohere'
+  | 'custom'
+
+// STT Provider Types
+export type TranscriberProvider = 
+  | 'deepgram' 
+  | 'openai' 
+  | 'assemblyai' 
+  | 'gladia'
+  | 'azure'
+  | 'google'
+  | 'speechmatics'
+  | 'rev'
 
 // Agent Configuration
 export interface AgentPrompts {

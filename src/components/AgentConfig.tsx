@@ -25,17 +25,125 @@ const VOICE_OPTIONS: Record<string, { value: string; label: string }[]> = {
     { value: 'shimmer', label: 'Shimmer (Soft Female)' },
   ],
   elevenlabs: [
-    { value: 'rachel', label: 'Rachel' },
-    { value: 'drew', label: 'Drew' },
-    { value: 'clyde', label: 'Clyde' },
-    { value: 'paul', label: 'Paul' },
+    { value: 'rachel', label: 'Rachel (Calm)' },
+    { value: 'drew', label: 'Drew (Well-rounded)' },
+    { value: 'clyde', label: 'Clyde (War Veteran)' },
+    { value: 'paul', label: 'Paul (Ground Reporter)' },
+    { value: 'domi', label: 'Domi (Strong)' },
+    { value: 'dave', label: 'Dave (Conversational)' },
+    { value: 'fin', label: 'Fin (Sailor)' },
+    { value: 'sarah', label: 'Sarah (Soft)' },
+    { value: 'antoni', label: 'Antoni (Well-rounded)' },
+    { value: 'thomas', label: 'Thomas (Calm)' },
+    { value: 'charlie', label: 'Charlie (Casual)' },
+    { value: 'emily', label: 'Emily (Calm)' },
+  ],
+  deepgram: [
+    { value: 'aura-asteria-en', label: 'Asteria (Female)' },
+    { value: 'aura-luna-en', label: 'Luna (Female)' },
+    { value: 'aura-stella-en', label: 'Stella (Female)' },
+    { value: 'aura-athena-en', label: 'Athena (Female)' },
+    { value: 'aura-hera-en', label: 'Hera (Female)' },
+    { value: 'aura-orion-en', label: 'Orion (Male)' },
+    { value: 'aura-arcas-en', label: 'Arcas (Male)' },
+    { value: 'aura-perseus-en', label: 'Perseus (Male)' },
+    { value: 'aura-angus-en', label: 'Angus (Male, Irish)' },
+    { value: 'aura-orpheus-en', label: 'Orpheus (Male)' },
+    { value: 'aura-helios-en', label: 'Helios (Male, British)' },
+    { value: 'aura-zeus-en', label: 'Zeus (Male)' },
+  ],
+  playht: [
+    { value: 'jennifer', label: 'Jennifer (Female)' },
+    { value: 'michael', label: 'Michael (Male)' },
+    { value: 'emma', label: 'Emma (Female)' },
+    { value: 'james', label: 'James (Male)' },
+    { value: 'sophia', label: 'Sophia (Female)' },
+    { value: 'william', label: 'William (Male)' },
+  ],
+  cartesia: [
+    { value: 'sonic-english-us', label: 'Sonic (US English)' },
+    { value: 'sonic-english-uk', label: 'Sonic (UK English)' },
+    { value: 'sonic-multilingual', label: 'Sonic (Multilingual)' },
+  ],
+  azure: [
+    { value: 'en-US-JennyNeural', label: 'Jenny (Female)' },
+    { value: 'en-US-GuyNeural', label: 'Guy (Male)' },
+    { value: 'en-US-AriaNeural', label: 'Aria (Female)' },
+    { value: 'en-US-DavisNeural', label: 'Davis (Male)' },
+    { value: 'en-US-AmberNeural', label: 'Amber (Female)' },
+    { value: 'en-US-AnaNeural', label: 'Ana (Female, Child)' },
+    { value: 'en-US-BrandonNeural', label: 'Brandon (Male)' },
+    { value: 'en-US-ChristopherNeural', label: 'Christopher (Male)' },
+  ],
+  rime: [
+    { value: 'mist', label: 'Mist (Female)' },
+    { value: 'grove', label: 'Grove (Male)' },
+    { value: 'bay', label: 'Bay (Female)' },
+    { value: 'cove', label: 'Cove (Male)' },
+  ],
+  lmnt: [
+    { value: 'lily', label: 'Lily (Female)' },
+    { value: 'daniel', label: 'Daniel (Male)' },
+  ],
+  neets: [
+    { value: 'vits', label: 'VITS (Default)' },
   ],
 }
 
 const LLM_MODELS: Record<string, string[]> = {
-  openai: ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-3.5-turbo'],
-  anthropic: ['claude-3-5-sonnet-20241022', 'claude-3-opus-20240229', 'claude-3-haiku-20240307'],
-  groq: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'],
+  openai: ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-4', 'gpt-3.5-turbo', 'o1-preview', 'o1-mini'],
+  anthropic: ['claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022', 'claude-3-opus-20240229', 'claude-3-sonnet-20240229', 'claude-3-haiku-20240307'],
+  groq: ['llama-3.3-70b-versatile', 'llama-3.1-70b-versatile', 'llama-3.1-8b-instant', 'llama-guard-3-8b', 'mixtral-8x7b-32768', 'gemma2-9b-it'],
+  together: ['meta-llama/Llama-3.3-70B-Instruct-Turbo', 'meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo', 'meta-llama/Llama-3.1-405B-Instruct-Turbo', 'mistralai/Mixtral-8x22B-Instruct-v0.1', 'Qwen/Qwen2.5-72B-Instruct-Turbo'],
+  google: ['gemini-2.0-flash-exp', 'gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'],
+  azure: ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-35-turbo'],
+  cerebras: ['llama3.1-8b', 'llama3.1-70b'],
+  fireworks: ['accounts/fireworks/models/llama-v3p1-405b-instruct', 'accounts/fireworks/models/llama-v3p1-70b-instruct', 'accounts/fireworks/models/mixtral-8x22b-instruct'],
+  perplexity: ['llama-3.1-sonar-large-128k-online', 'llama-3.1-sonar-small-128k-online', 'llama-3.1-sonar-huge-128k-online'],
+  mistral: ['mistral-large-latest', 'mistral-medium-latest', 'mistral-small-latest', 'open-mixtral-8x22b', 'open-mistral-nemo'],
+  cohere: ['command-r-plus', 'command-r', 'command-light'],
+  custom: ['custom-model'],
+}
+
+const STT_MODELS: Record<string, { value: string; label: string }[]> = {
+  deepgram: [
+    { value: 'nova-2', label: 'Nova 2 (Recommended)' },
+    { value: 'nova-2-general', label: 'Nova 2 General' },
+    { value: 'nova-2-meeting', label: 'Nova 2 Meeting' },
+    { value: 'nova-2-phonecall', label: 'Nova 2 Phone Call' },
+    { value: 'nova-2-conversationalai', label: 'Nova 2 Conversational AI' },
+    { value: 'nova', label: 'Nova' },
+    { value: 'enhanced', label: 'Enhanced' },
+    { value: 'base', label: 'Base' },
+  ],
+  openai: [
+    { value: 'whisper-1', label: 'Whisper v1' },
+  ],
+  assemblyai: [
+    { value: 'best', label: 'Best (Highest Accuracy)' },
+    { value: 'nano', label: 'Nano (Fastest)' },
+  ],
+  gladia: [
+    { value: 'fast', label: 'Fast' },
+    { value: 'accurate', label: 'Accurate' },
+  ],
+  azure: [
+    { value: 'en-US', label: 'English (US)' },
+    { value: 'en-GB', label: 'English (UK)' },
+  ],
+  google: [
+    { value: 'latest_long', label: 'Latest Long' },
+    { value: 'latest_short', label: 'Latest Short' },
+    { value: 'telephony', label: 'Telephony' },
+    { value: 'medical_dictation', label: 'Medical Dictation' },
+  ],
+  speechmatics: [
+    { value: 'en', label: 'English' },
+  ],
+  rev: [
+    { value: 'machine', label: 'Machine' },
+    { value: 'human', label: 'Human' },
+  ],
 }
 
 export default function AgentConfig({ agent, onSave, onCancel }: AgentConfigProps) {
@@ -323,20 +431,36 @@ function VoiceTab({ formData, setFormData }: { formData: Agent; setFormData: (d:
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="label">Voice Provider</label>
+          <label className="label">TTS Provider</label>
           <select
             value={formData.voice.provider}
-            onChange={(e) => setFormData({
-              ...formData,
-              voice: { ...formData.voice, provider: e.target.value as any }
-            })}
+            onChange={(e) => {
+              const newProvider = e.target.value as any
+              const newVoices = VOICE_OPTIONS[newProvider] || []
+              setFormData({
+                ...formData,
+                voice: { 
+                  ...formData.voice, 
+                  provider: newProvider,
+                  voiceId: newVoices[0]?.value || ''
+                }
+              })
+            }}
             className="select"
           >
-            <option value="openai">OpenAI</option>
-            <option value="elevenlabs">ElevenLabs</option>
-            <option value="deepgram">Deepgram</option>
-            <option value="playht">PlayHT</option>
-            <option value="cartesia">Cartesia</option>
+            <optgroup label="Popular">
+              <option value="openai">OpenAI TTS</option>
+              <option value="elevenlabs">ElevenLabs</option>
+              <option value="deepgram">Deepgram Aura</option>
+            </optgroup>
+            <optgroup label="More Providers">
+              <option value="playht">PlayHT</option>
+              <option value="cartesia">Cartesia</option>
+              <option value="azure">Azure Speech</option>
+              <option value="rime">Rime</option>
+              <option value="lmnt">LMNT</option>
+              <option value="neets">Neets</option>
+            </optgroup>
           </select>
         </div>
         <div>
@@ -395,6 +519,7 @@ function VoiceTab({ formData, setFormData }: { formData: Agent; setFormData: (d:
               })}
               className="w-full accent-sky-500"
             />
+            <p className="text-xs text-slate-500 mt-1">Higher = more consistent, Lower = more expressive</p>
           </div>
           <div>
             <label className="label">Similarity Boost: {(formData.voice.similarityBoost || 0.75).toFixed(1)}</label>
@@ -407,9 +532,57 @@ function VoiceTab({ formData, setFormData }: { formData: Agent; setFormData: (d:
               })}
               className="w-full accent-sky-500"
             />
+            <p className="text-xs text-slate-500 mt-1">How closely to match the original voice</p>
           </div>
+          <div>
+            <label className="label">Style: {(formData.voice.style || 0).toFixed(1)}</label>
+            <input
+              type="range" min="0" max="1" step="0.1"
+              value={formData.voice.style || 0}
+              onChange={(e) => setFormData({
+                ...formData,
+                voice: { ...formData.voice, style: parseFloat(e.target.value) }
+              })}
+              className="w-full accent-sky-500"
+            />
+            <p className="text-xs text-slate-500 mt-1">Amplify style of original speaker</p>
+          </div>
+          <label className="flex items-center gap-3 cursor-pointer p-4 bg-slate-900/50 rounded-xl">
+            <input
+              type="checkbox"
+              checked={formData.voice.useSpeakerBoost || false}
+              onChange={(e) => setFormData({
+                ...formData,
+                voice: { ...formData.voice, useSpeakerBoost: e.target.checked }
+              })}
+              className="w-5 h-5 rounded border-slate-600 bg-slate-700 text-sky-500"
+            />
+            <div>
+              <span className="font-medium">Speaker Boost</span>
+              <p className="text-xs text-slate-400">Boost similarity to original speaker (may increase latency)</p>
+            </div>
+          </label>
         </>
       )}
+
+      <div>
+        <label className="label">Emotion</label>
+        <select
+          value={formData.voice.emotion || 'neutral'}
+          onChange={(e) => setFormData({
+            ...formData,
+            voice: { ...formData.voice, emotion: e.target.value as any }
+          })}
+          className="select"
+        >
+          <option value="neutral">Neutral</option>
+          <option value="happy">Happy</option>
+          <option value="sad">Sad</option>
+          <option value="angry">Angry</option>
+          <option value="fearful">Fearful</option>
+          <option value="surprised">Surprised</option>
+        </select>
+      </div>
 
       <label className="flex items-center gap-3 cursor-pointer p-4 bg-slate-900/50 rounded-xl">
         <input
@@ -431,39 +604,55 @@ function VoiceTab({ formData, setFormData }: { formData: Agent; setFormData: (d:
 }
 
 function TranscriberTab({ formData, setFormData }: { formData: Agent; setFormData: (d: Agent) => void }) {
+  const models = STT_MODELS[formData.transcriber.provider] || STT_MODELS.deepgram
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="label">Transcriber Provider</label>
+          <label className="label">STT Provider</label>
           <select
             value={formData.transcriber.provider}
-            onChange={(e) => setFormData({
-              ...formData,
-              transcriber: { ...formData.transcriber, provider: e.target.value as any }
-            })}
+            onChange={(e) => {
+              const newProvider = e.target.value as any
+              const newModels = STT_MODELS[newProvider] || []
+              setFormData({
+                ...formData,
+                transcriber: { 
+                  ...formData.transcriber, 
+                  provider: newProvider,
+                  model: newModels[0]?.value || ''
+                }
+              })
+            }}
             className="select"
           >
-            <option value="deepgram">Deepgram</option>
-            <option value="openai">OpenAI Whisper</option>
-            <option value="assemblyai">AssemblyAI</option>
-            <option value="gladia">Gladia</option>
+            <optgroup label="Popular">
+              <option value="deepgram">Deepgram</option>
+              <option value="openai">OpenAI Whisper</option>
+              <option value="assemblyai">AssemblyAI</option>
+            </optgroup>
+            <optgroup label="More Providers">
+              <option value="gladia">Gladia</option>
+              <option value="azure">Azure Speech</option>
+              <option value="google">Google Speech</option>
+              <option value="speechmatics">Speechmatics</option>
+              <option value="rev">Rev AI</option>
+            </optgroup>
           </select>
         </div>
         <div>
           <label className="label">Model</label>
           <select
-            value={formData.transcriber.model || 'nova-2'}
+            value={formData.transcriber.model || models[0]?.value}
             onChange={(e) => setFormData({
               ...formData,
               transcriber: { ...formData.transcriber, model: e.target.value }
             })}
             className="select"
           >
-            <option value="nova-2">Nova 2 (Recommended)</option>
-            <option value="nova">Nova</option>
-            <option value="enhanced">Enhanced</option>
-            <option value="base">Base</option>
+            {models.map((m) => (
+              <option key={m.value} value={m.value}>{m.label}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -478,11 +667,25 @@ function TranscriberTab({ formData, setFormData }: { formData: Agent; setFormDat
           })}
           className="select"
         >
-          <option value="en">English</option>
-          <option value="es">Spanish</option>
-          <option value="fr">French</option>
-          <option value="de">German</option>
-          <option value="multi">Multi-language</option>
+          <optgroup label="Common">
+            <option value="en">English</option>
+            <option value="en-US">English (US)</option>
+            <option value="en-GB">English (UK)</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+          </optgroup>
+          <optgroup label="More Languages">
+            <option value="it">Italian</option>
+            <option value="pt">Portuguese</option>
+            <option value="nl">Dutch</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+            <option value="zh">Chinese</option>
+            <option value="ar">Arabic</option>
+            <option value="hi">Hindi</option>
+            <option value="multi">Multi-language (Auto-detect)</option>
+          </optgroup>
         </select>
       </div>
 
@@ -503,6 +706,20 @@ function TranscriberTab({ formData, setFormData }: { formData: Agent; setFormDat
       </div>
 
       <div>
+        <label className="label">Keyword Boost: {(formData.transcriber.keywordBoost || 0).toFixed(1)}</label>
+        <input
+          type="range" min="0" max="2" step="0.1"
+          value={formData.transcriber.keywordBoost || 0}
+          onChange={(e) => setFormData({
+            ...formData,
+            transcriber: { ...formData.transcriber, keywordBoost: parseFloat(e.target.value) }
+          })}
+          className="w-full accent-sky-500"
+        />
+        <p className="text-xs text-slate-500 mt-1">How much to boost recognition of keywords below.</p>
+      </div>
+
+      <div>
         <label className="label">Keywords (for boosting)</label>
         <input
           type="text"
@@ -512,10 +729,18 @@ function TranscriberTab({ formData, setFormData }: { formData: Agent; setFormDat
             transcriber: { ...formData.transcriber, keywords: e.target.value.split(',').map(s => s.trim()).filter(Boolean) }
           })}
           className="input"
-          placeholder="product names, technical terms, etc."
+          placeholder="product names, technical terms, company names, etc."
         />
         <p className="text-xs text-slate-500 mt-1">Comma-separated words to boost recognition accuracy.</p>
       </div>
+
+      {formData.transcriber.provider === 'deepgram' && (
+        <div className="p-4 bg-sky-500/10 border border-sky-500/30 rounded-xl">
+          <p className="text-sm text-sky-400">
+            <strong>Tip:</strong> For phone calls, use the "Nova 2 Phone Call" model for best accuracy.
+          </p>
+        </div>
+      )}
     </div>
   )
 }
@@ -530,17 +755,38 @@ function LLMTab({ formData, setFormData }: { formData: Agent; setFormData: (d: A
           <label className="label">LLM Provider</label>
           <select
             value={formData.llm.provider}
-            onChange={(e) => setFormData({
-              ...formData,
-              llm: { ...formData.llm, provider: e.target.value as any }
-            })}
+            onChange={(e) => {
+              const newProvider = e.target.value as any
+              const newModels = LLM_MODELS[newProvider] || []
+              setFormData({
+                ...formData,
+                llm: { 
+                  ...formData.llm, 
+                  provider: newProvider,
+                  model: newModels[0] || ''
+                }
+              })
+            }}
             className="select"
           >
-            <option value="openai">OpenAI</option>
-            <option value="anthropic">Anthropic</option>
-            <option value="groq">Groq</option>
-            <option value="together">Together AI</option>
-            <option value="custom">Custom LLM</option>
+            <optgroup label="Popular">
+              <option value="openai">OpenAI</option>
+              <option value="anthropic">Anthropic</option>
+              <option value="groq">Groq (Fast)</option>
+              <option value="together">Together AI</option>
+            </optgroup>
+            <optgroup label="More Providers">
+              <option value="google">Google (Gemini)</option>
+              <option value="azure">Azure OpenAI</option>
+              <option value="cerebras">Cerebras</option>
+              <option value="fireworks">Fireworks AI</option>
+              <option value="perplexity">Perplexity</option>
+              <option value="mistral">Mistral AI</option>
+              <option value="cohere">Cohere</option>
+            </optgroup>
+            <optgroup label="Custom">
+              <option value="custom">Custom LLM</option>
+            </optgroup>
           </select>
         </div>
         <div>
@@ -573,6 +819,7 @@ function LLMTab({ formData, setFormData }: { formData: Agent; setFormData: (d: A
             className="input"
             placeholder="https://your-llm-endpoint.com/v1/chat/completions"
           />
+          <p className="text-xs text-slate-500 mt-1">Must be OpenAI-compatible API endpoint</p>
         </div>
       )}
 
@@ -605,6 +852,33 @@ function LLMTab({ formData, setFormData }: { formData: Agent; setFormData: (d: A
         <p className="text-xs text-slate-500 mt-1">Keep low (128-256) for faster responses in voice.</p>
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="label">Top P: {(formData.llm.topP || 1).toFixed(1)}</label>
+          <input
+            type="range" min="0" max="1" step="0.1"
+            value={formData.llm.topP || 1}
+            onChange={(e) => setFormData({
+              ...formData,
+              llm: { ...formData.llm, topP: parseFloat(e.target.value) }
+            })}
+            className="w-full accent-sky-500"
+          />
+        </div>
+        <div>
+          <label className="label">Frequency Penalty: {(formData.llm.frequencyPenalty || 0).toFixed(1)}</label>
+          <input
+            type="range" min="0" max="2" step="0.1"
+            value={formData.llm.frequencyPenalty || 0}
+            onChange={(e) => setFormData({
+              ...formData,
+              llm: { ...formData.llm, frequencyPenalty: parseFloat(e.target.value) }
+            })}
+            className="w-full accent-sky-500"
+          />
+        </div>
+      </div>
+
       <label className="flex items-center gap-3 cursor-pointer p-4 bg-slate-900/50 rounded-xl">
         <input
           type="checkbox"
@@ -620,6 +894,22 @@ function LLMTab({ formData, setFormData }: { formData: Agent; setFormData: (d: A
           <p className="text-xs text-slate-400">Cache similar queries to reduce latency and cost</p>
         </div>
       </label>
+
+      {formData.llm.provider === 'groq' && (
+        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl">
+          <p className="text-sm text-emerald-400">
+            <strong>⚡ Groq:</strong> Ultra-fast inference with LPU technology. Great for low-latency voice applications.
+          </p>
+        </div>
+      )}
+
+      {formData.llm.provider === 'anthropic' && (
+        <div className="p-4 bg-purple-500/10 border border-purple-500/30 rounded-xl">
+          <p className="text-sm text-purple-400">
+            <strong>Claude:</strong> Excellent for nuanced conversations and following complex instructions.
+          </p>
+        </div>
+      )}
     </div>
   )
 }
