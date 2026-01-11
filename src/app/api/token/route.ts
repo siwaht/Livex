@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { generateToken, getLiveKitUrl } from '@/lib/livekit'
+import { generateToken, getLiveKitUrl, hasLiveKitCredentials } from '@/lib/livekit'
 import { getAgent } from '@/lib/agents-store'
 import { getUser } from '@/lib/users-store'
 import { successResponse, errorResponse, badRequestResponse, notFoundResponse, parseJsonBody } from '@/lib/api-utils'
@@ -47,6 +47,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Check if we have any credentials available
+    if (!hasLiveKitCredentials(credentials)) {
+      return errorResponse(
+        'LiveKit not configured. Please go to Settings > LiveKit to add your credentials.',
+        400
+      )
+    }
+
     const roomName = `${agentId}-${Date.now()}`
     const participantIdentity = `user-${Date.now()}`
     const participantName = userName || 'User'
@@ -61,6 +69,7 @@ export async function POST(request: NextRequest) {
       agentName: agent.name,
     })
   } catch (error) {
-    return errorResponse('Failed to generate token', 500, error)
+    const message = error instanceof Error ? error.message : 'Failed to generate token'
+    return errorResponse(message, 500, error)
   }
 }
